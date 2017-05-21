@@ -2,7 +2,7 @@
 const pkg = require('../package')
 
 module.exports = {
-  port: 4000,
+  port: 3000,
   title: 'ipl-dashboard',
   domain: 'ipl-dashboard.surge.sh',
   // when you use electron please set to relative path like ./
