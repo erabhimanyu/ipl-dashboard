@@ -6,6 +6,7 @@ const webpack = require('webpack')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const ProgressPlugin = require('webpack/lib/ProgressPlugin')
 const OfflinePlugin = require('offline-plugin')
+const WebpackOnBuildPlugin = require('on-build-webpack')
 const base = require('./webpack.base')
 const pkg = require('../package')
 const _ = require('./utils')
@@ -88,5 +89,13 @@ base.stats = {
   chunkOrigins: false,
   modules: false
 }
+
+
+base.plugins.push(
+  new WebpackOnBuildPlugin(function(stats) {
+        // Do whatever you want...
+        exec('echo '+ config.domain + ' > dist/CNAME');
+  })
+);
 
 module.exports = base
