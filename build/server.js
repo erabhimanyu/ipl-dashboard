@@ -33,7 +33,7 @@ const devMiddleWare = require('webpack-dev-middleware')(compiler, {
 })
 app.use(devMiddleWare)
 app.use(require('webpack-hot-middleware')(compiler, {
-  log: () => {}
+  log: (output) => {console.log(output)}
 }))
 
 const mfs = devMiddleWare.fileSystem
