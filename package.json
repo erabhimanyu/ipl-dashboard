@@ -4,9 +4,10 @@
   "description": "My Superb Vue Project",
   "main": "client/index.js",
   "scripts": {
-    "test": "",
     "build": "webpack --config build/webpack.prod.js",
-    "dev": "node build/server.js"  },
+    "start" : "webpack --config build/webpack.prod.js && surge ./dist",
+    "dev": "node build/server.js"
+  },
   "author": "Abhimanyu Arora <er.abhimanyuarora@gmail.com>",
   "license": "MIT",
   "xo": {
