@@ -47,7 +47,7 @@ module.exports = {
         loaders: ['babel-loader']
       },
       {
-        test: /\.(ico|jpg|png|gif|eot|otf|webp|ttf|woff|woff2)(\?.*)?$/,
+        test: /\.(ico|jpg|png|gif|eot|otf|webp|ttf|woff|woff2|svg)(\?.*)?$/,
         loader: 'file-loader',
         query: {
           name: 'static/media/[name].[hash:8].[ext]'
