@@ -3,7 +3,7 @@ const pkg = require('../package')
 
 module.exports = {
   port: 3000,
-  title: 'ipl-dashboard',
+  title: 'IPL-Dashboard',
   domain: 'ipl-dashboard.surge.sh',
   // when you use electron please set to relative path like ./
   // otherwise only set to absolute path when you're using history mode
