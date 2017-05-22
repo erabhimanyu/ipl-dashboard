@@ -95,6 +95,7 @@ base.plugins.push(
   new WebpackOnBuildPlugin(function(stats) {
         // Do whatever you want...
         exec('echo '+ config.domain + ' > dist/CNAME');
+        exec('cp build/404.html dist/404.html');
   })
 );
 
