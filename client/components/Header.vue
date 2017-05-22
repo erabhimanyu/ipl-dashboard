@@ -1,10 +1,10 @@
 <template>
 	<div class="header">
     			<div class="menu">
-    				<span>Home</span>
-    				<span>Whose Paradise?</span>
-    				<span>Teams</span>
-    				<span>About</span>
+    				<router-link to="/" tag="span" exact>Home</router-link>
+    				<router-link to="/paradise" tag="span">Whose Paradise?</router-link>
+    				<router-link to="/team" tag="span">Teams</router-link>
+    				<router-link to="/about" tag="span">About</router-link>
     			</div>
     	</div>
 </template>
@@ -22,15 +22,22 @@
 		span {
 			padding: 30px;
 			font-family: MarkerFelt;
-			margin-right: 100px;
+			margin-right: 50px;
 			color: #616161;
+			text-decoration: none;
 			cursor: pointer;
+			&:hover {
+				background-image: url(/images/patch.png);
+	   		background-size: contain;
+	   		background-repeat: no-repeat;
+	   		background-position: center;
+			}
 		}
-		span:hover {
-			background-image: url(/images/patch.png);
-   		background-size: contain;
-   		background-repeat: no-repeat;
-   		background-position: center;
-		}
+		.router-link-active {
+				background-image: url(/images/patch.png);
+   			background-size: contain;
+   			background-repeat: no-repeat;
+   			background-position: center;
+			}
 	}
 </style>
