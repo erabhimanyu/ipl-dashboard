@@ -6,7 +6,7 @@
     	<BatVisualization></BatVisualization>
     	<TeamListing></TeamListing>
     	<div class="stadium"></div>
-    	<div class="footer"></div>
+    	<FooterElement></FooterElement>
     </div>
   </div>
 </template>
@@ -16,13 +16,16 @@ import HeaderElement from 'components/Header'
 import ForkGithub from 'components/ForkGithub'
 import BatVisualization from 'components/BatVisualization'
 import TeamListing from 'components/TeamListing'
+import FooterElement from 'components/Footer'
+
 
 export default {
   components: {
     HeaderElement,
     ForkGithub,
     BatVisualization,
-    TeamListing
+    TeamListing,
+    FooterElement
   }
 }
 </script>
