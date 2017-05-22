@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '../views/Home'
+import Teams from '../views/Teams'
+import WhoseParadise from '../views/WhoseParadise'
+import About from '../views/About'
 import FourOFour from '../views/FourOhFour'
 
 Vue.use(Router)
@@ -14,15 +17,15 @@ export default new Router({
     },
     {
       path: '/team',
-      component: Home
+      component: Teams
     },
     {
       path: '/about',
-      component: Home
+      component: About
     },
     {
       path: '/paradise',
-      component: Home
+      component: WhoseParadise
     },
     {
        path: '*', 
