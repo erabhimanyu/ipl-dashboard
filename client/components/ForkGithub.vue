@@ -10,7 +10,7 @@
 	.fork-github {
 		width: 100%;
 		img {
-			position: fixed;
+			position: absolute;
 			right: 0px;
 			top: 0px;
 			width: 15%;
