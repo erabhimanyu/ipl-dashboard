@@ -2,23 +2,27 @@
   <div class="page">
     <div class="home-wrapper">
     	<ForkGithub></ForkGithub>
-    	<Header></Header>
-    	<img src="/images/stadium.png">
+    	<HeaderElement></HeaderElement>
+    	<BatVisualization></BatVisualization>
+    	<TeamListing></TeamListing>
+    	<div class="stadium"></div>
     	<div class="footer"></div>
     </div>
   </div>
 </template>
 
 <script>
-import Counter from 'components/Counter'
-import Header from 'components/Header'
+import HeaderElement from 'components/Header'
 import ForkGithub from 'components/ForkGithub'
+import BatVisualization from 'components/BatVisualization'
+import TeamListing from 'components/TeamListing'
 
 export default {
   components: {
-    Counter,
-    Header,
-    ForkGithub
+    HeaderElement,
+    ForkGithub,
+    BatVisualization,
+    TeamListing
   }
 }
 </script>
@@ -28,5 +32,13 @@ export default {
 		flex-direction: column;
 		align-items: center;
 		width: 100%;
+	}
+	.stadium {
+		background-image: url('/images/stadium.png');
+		background-size: cover;
+		background-repeat: no-repeat;
+		background-position: center;
+		width: 100%;
+		min-height: 600px;
 	}
 </style>
