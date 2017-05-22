@@ -5,7 +5,7 @@
   "main": "client/index.js",
   "scripts": {
     "build": "webpack --config build/webpack.prod.js",
-    "start" : "webpack --config build/webpack.prod.js && surge ./dist",
+    "start": "webpack --config build/webpack.prod.js && surge ./dist",
     "dev": "node build/server.js"
   },
   "author": "Abhimanyu Arora <er.abhimanyuarora@gmail.com>",
@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "babel-runtime": "^6.18.0",
+    "font-awesome": "^4.7.0",
     "promise-polyfill": "^6.0.2",
     "vue": "^2.2.0",
     "vue-router": "^2.0.0",
@@ -45,6 +46,7 @@
     "postcss-nested": "^1.0.0",
     "raw-loader": "^0.5.1",
     "style-loader": "^0.13.1",
+    "url-loader": "^0.5.8",
     "vue-loader": "^11.0.0",
     "vue-template-compiler": "^2.2.0",
     "webpack": "2.2.0",
