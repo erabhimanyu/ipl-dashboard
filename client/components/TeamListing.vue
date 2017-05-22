@@ -24,7 +24,6 @@
 </template>
 <style>
   .team-listing-wrapper {
-    display: flex;
     flex-direction: column;
     flex-wrap: wrap;
   }
@@ -33,8 +32,8 @@
     flex-direction: row;
     span {
       padding: 20px;
-      width: 160px;
-      height: 150px;
+      width: 110px;
+      height: 100px;
       cursor: pointer;
       &:hover {
         background: #dee5ea;
@@ -42,15 +41,15 @@
       }
     }
     img {
-      max-width: 170px;
-      max-height: 150px;
+      max-width: 100px;
+      max-height: 100px;
     }
 
   .ipl-image {
     cursor: auto !important;
     padding: 20px;
-    width: 160px;
-    height: 150px;
+    width: 100px;
+    height: 100px;
     &:hover {
       border-radius: 0px;
     }
