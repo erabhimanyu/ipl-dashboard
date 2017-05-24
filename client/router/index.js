@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '../views/Home'
 import Teams from '../views/Teams'
+import TeamPage from '../views/TeamPage'
 import WhoseParadise from '../views/WhoseParadise'
 import About from '../views/About'
 import FourOFour from '../views/FourOhFour'
@@ -17,7 +18,11 @@ export default new Router({
     },
     {
       path: '/team',
-      component: Teams
+      component: Teams,
+    },
+    {
+      path: '/team/:teamName',
+      component: TeamPage
     },
     {
       path: '/about',
