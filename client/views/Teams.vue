@@ -3,7 +3,7 @@
 	<ForkGithub></ForkGithub>
 	  <HeaderElement></HeaderElement>
 	  <div class="content-wrapper">
-	  	<p>Disover Teams</p>
+	  	<p>Discover Teams</p>
 	  	<div class="team-page-list-wrapper">
 	  		<TeamListing></TeamListing>
 	  	</div>

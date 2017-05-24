@@ -55,7 +55,7 @@ export default {
 		}
 		img {
 			max-width: 150px;
-			height: 100px;
+			max-height: 100px;
 		}
 	}
 </style>

@@ -55,6 +55,7 @@
       width: 110px;
       height: 100px;
       cursor: pointer;
+      text-align: center;
       &:hover {
         background: #dee5ea;
         border-radius: 8px;
