@@ -30,3 +30,24 @@
   url('/fonts/Marker-Felt.ttf')  format('truetype'),
   url('/fonts/Marker-Felt.svg#svgFontName') format('svg');
 }
+
+.no-display {
+  display: none;
+}
+
+.main-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+.content-wrapper {
+  min-height: 600px;
+  width: 100%;
+  p {
+    font-family: MarkerFelt;
+    font-size: 3rem;
+    text-align: center;
+    color: slategray;
+  }
+}
