@@ -4,7 +4,9 @@
 	  <HeaderElement></HeaderElement>
 	  <div class="content-wrapper">
 	  	<p>Disover Teams</p>
-	  	<TeamListing></TeamListing>
+	  	<div class="team-page-list-wrapper">
+	  		<TeamListing></TeamListing>
+	  	</div>
 	  </div>
 	  <FooterElement></FooterElement>
 	</div>
@@ -24,3 +26,11 @@ export default {
   }
 }
 </script>
+
+<style>
+	.team-page-list-wrapper {
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+	}
+</style>

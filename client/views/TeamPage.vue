@@ -51,6 +51,7 @@ export default {
 			background-color: rgba(128, 128, 128, 0.28);
 			text-align: center;
 			padding-top: 10px; 
+			border-radius: 8px;
 		}
 		img {
 			max-width: 150px;
