@@ -8,6 +8,9 @@
 	  		<span>
 	  			<img v-bind:src="imgLink">
 	  		</span>
+	  		<p>
+	  			Team content to be added soon
+	  		</p>
 	  	</div>
 	  </div>
 	  <FooterElement></FooterElement>
@@ -42,7 +45,7 @@ export default {
 <style>
 	.team-info-wrapper {
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
 		align-items: flex-start;
 		margin-left: 300px;
 		span {
@@ -56,6 +59,10 @@ export default {
 		img {
 			max-width: 150px;
 			max-height: 100px;
+		}
+		p {
+			padding: 10px;
+			font-size: 1.5rem !important;
 		}
 	}
 </style>

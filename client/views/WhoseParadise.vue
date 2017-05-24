@@ -4,6 +4,7 @@
 	  <HeaderElement></HeaderElement>
 	  <div class="content-wrapper">
 	  <!-- Page content goes here -->
+	  	<p>Content to be added soon</p>
 	  </div>
 	  <FooterElement></FooterElement>
 	</div>
