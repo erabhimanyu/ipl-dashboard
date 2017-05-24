@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <div class="home-wrapper">
+    <div class="main-wrapper">
     	<ForkGithub></ForkGithub>
     	<HeaderElement></HeaderElement>
     	<BatVisualization></BatVisualization>
@@ -30,12 +30,6 @@ export default {
 }
 </script>
 <style>
-	.home-wrapper {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		width: 100%;
-	}
 	.stadium {
 		background-image: url('/images/stadium.png');
 		background-size: cover;
