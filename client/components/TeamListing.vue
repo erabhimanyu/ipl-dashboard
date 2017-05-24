@@ -1,27 +1,47 @@
 <template>
   <div class="team-listing-wrapper">
     <div class="team-list">
-      <span><img src="/images/teams/kkr.jpg"></span>
-      <span><img src="/images/teams/chennai_super_king.png"></span>
-      <span><img src="/images/teams/delhi_daredevils.png"></span>
-      <span><img src="/images/teams/hyderabad_sunrisers.png"></span>
-      <span><img src="/images/teams/rajasthan_royals.png"></span>
-      <span><img src="/images/teams/royal_challengers.png"></span>
-      <span><img src="/images/teams/mumbai_indians.jpg"></span>
+      <span @click="goto('/team/KKR')"><img v-bind:src="KKR.imageSrc"></span>
+      <span @click="goto('/team/CSK')"><img v-bind:src="CSK.imageSrc"></span>
+      <span @click="goto('/team/DDD')"><img v-bind:src="DDD.imageSrc"></span>
+      <span @click="goto('/team/HSR')"><img v-bind:src="HSR.imageSrc"></span>
+      <span @click="goto('/team/RR')"><img v-bind:src="RR.imageSrc"></span>
+      <span @click="goto('/team/RC')"><img v-bind:src="RC.imageSrc"></span>
+      <span @click="goto('/team/MI')"><img v-bind:src="MI.imageSrc"></span>
     </div>
     <div class="team-list">
-        <span><img src="/images/teams/kings_11_punjab.png"></span>
-        <span><img src="/images/teams/deccan_chargers.png"></span>
-        <span><img src="/images/teams/pune_warriors_india.png"></span>
-        <div class="ipl-image">
-            <img src="/images/ipl.jpg">
-        </div>
-        <span><img src="/images/teams/rising_pune.png"></span>
-        <span><img src="/images/teams/Gujarat_Lions.png"></span>
-        <span><img src="/images/teams/kochi_tuskers.png"></span>
+      <span @click="goto('/team/KEP')"><img src="/images/teams/KEP.png"></span>
+      <span @click="goto('/team/DC')"><img src="/images/teams/DC.png"></span>
+      <span @click="goto('/team/PWI')"><img src="/images/teams/PWI.png"></span>
+      <div class="ipl-image">
+        <img src="/images/ipl.jpg">
+      </div>
+      <span @click="goto('/team/RP')"><img src="/images/teams/RP.png"></span>
+      <span @click="goto('/team/GL')"><img src="/images/teams/GL.png"></span>
+      <span @click="goto('/team/KT')"><img src="/images/teams/KT.png"></span>
     </div>
   </div>
 </template>
+
+<script>
+  import { teams } from '../Config.js'
+  export default {
+    data: function() {
+      return {...teams}
+    },
+    methods: {
+      goto: function(m){
+        this.$router.push(m)
+      }
+    },
+    computed: {
+      imgLink: function(teamName) {
+        return teams['KKR']
+      }
+    } 
+  }
+</script>
+
 <style>
   .team-listing-wrapper {
     flex-direction: column;
