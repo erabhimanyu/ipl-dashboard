@@ -2,13 +2,49 @@
 	<div class="bat-visualization-wrapper">
     <img src="/images/batsman.png">
     <div id="chart">
+    <div class="tooltip" :class="{ hide: !tip.visible }" :style="{top: tip.top + 'px', left: tip.left + 'px'} ">
+    		<p>{{tip.data}}</p>
+    </div>
+    	<svg :height="height+extraPadding" :width="width+extraPadding" ref="containerSvg">
+	    	<g class="x axis" id="" ref="xAxis" :transform="translate(40,height)"></g>
+	    	<g class="y axis" ref="yAxis" :transform="translate(40,0)"></g>
+	    	<g class="balls" ref="balls" v-bind:transform="translate(40,0)">
+	    		<image 	v-for="d in curretBallsData" 
+	    						:href="d.src" :x="d.x" :y="d.y" 
+	    						:height="ballWidth" 
+	    						:width="ballWidth"
+	    						@mouseover="showToolTip(d.name, $event)"
+	    						@mouseout="hideToolTip"
+	    						>
+	    		</image>
+	    	</g>
+	    	<text class="x axis label" text-anchor="end" :x="width" :y="height-6">Runs scored in boundaries</text>
+	    	<text class="y axis label" text-anchor="end" y="25" dy=".75em" transform="translate(20) rotate(-90)">Total runs scored</text>
+	    	<text class="year label"
+	    				ref="label"
+	    				text-anchor="end" 
+	    				:y="height+100" 
+	    				:x="width">
+	    				{{ displayYear }}
+	    	</text>
+	    	<text class="year label-text" text-anchor="end" :y="height+130" :x="width">IPL Season</text>
+	    	<rect @mouseover="enableInteraction" 
+	    				class="overlay" 
+	    				:x="overlay.x" 
+	    				:y="overlay.y" 
+	    				:width="overlay.width"
+	    				ref="overlay"
+	    				:height="overlay.height"
+	    				>
+	    	</rect>
+    	</svg>
     </div>
   </div>
 </template>
 <script>
 	import seasonData from '../../data/seasons.json'
 	//import D3
-	const d3 = require("d3")
+	import * as d3 from 'd3'
 
 	export default {
 
@@ -21,16 +57,54 @@
 			height: 500 - margin.top - margin.bottom,
 			ballWidth: 50,
 			extraPadding: 130,
-			xMin: 150,
-			xMax: 400,
+			xMin: 200,
+			xMax: 1800,
 			yMin: 1000,
 			yMax: 3500,
 			xTicks: 12,
 			seasonMin: 2008,
-			seasonMax: 2016
+			seasonMax: 2016,
+			overlay: {
+				height: 0,
+				width: 0,
+				x: 0,
+				y: 0
+			},
+			xScale: null,
+			yScale: null,
+			curretBallsData: [],
+			displayYear: 2008,
+			tip: {
+				visible: false,
+				data: null,
+				top: 0,
+				left: 0
+			}
 		}
 	},
 	methods: {
+		addBalls(year) {			
+			let data = [];
+			this.getDataTeamWise(year).map((d)=> {
+				data.push({
+					x: this.xScale(this.calculateTotalBoundaries(d)), 
+					y: this.yScale(this.calculateTotalRuns(d)), 
+					src:'/images/ball.png',
+					name: d.name
+				})
+				}
+			)
+			this.curretBallsData = data;
+		},
+		translate(x,y){
+			return 'translate('+x+','+y+')'
+		},
+		interpolateData(event){
+			let currentYear = 2015;
+			//console.log(Math.round(this.yearScale.invert(d3.mouse(d3.select(this.$el).node()))))
+		    //vueInstance.displayYear(currentYear,label,ball,xScale,yScale);
+		   this.addBalls(currentYear);
+		},
 		getDataTeamWise(year) {
 			let data
 			data = Object.keys(seasonData[year].teams).map(function(k) {
@@ -41,10 +115,8 @@
 			return data
 		},
 		calculateTotalBoundaries(data) {
-			let total = Number(data.firstInnings.boundaries.no_of_six) 
-								+ Number(data.firstInnings.boundaries.no_of_four) 
-								+ Number(data.secondInnings.boundaries.no_of_six) 
-								+ Number(data.secondInnings.boundaries.no_of_four)
+			let total = Number(data.firstInnings.boundaries.total_runs) 
+							
 			return total
 		},
 		calculateTotalRuns(data) {
@@ -52,54 +124,50 @@
 								+ data.secondInnings.runs
 			return total
 		},
-		positionBalls(ball, xScale, yScale) {	 		
-	 			return ball.attr('x', (d, i) => xScale(this.calculateTotalBoundaries(d)))
-						.attr('y', d => yScale(this.calculateTotalRuns(d)))
-  	},
-  	styleBall(ball,ballWidth){
-  		return ball.attr('height', ballWidth)
-  				.attr('width', ballWidth)
-  	},
-  	showToolTip(tip,d){
-			return tip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px")
-					.style("opacity", 0.9)
-					.text(d.name)
+  	showToolTip(d,event){
+			this.tip.data = d
+			//this.
+			this.tip.visible = true
+			this.tip.top = event.pageY+15
+			this.tip.left = event.pageX+15
   	},
   	hideToolTip(tip,d){
-  		return tip.style('opacity', 0)
+  		this.tip.visible = false
+  		this.tip.data = null
   	},
   	enableInteraction(ball,label,box,svg,overlay,xScale,yScale) {
+
   		let vueInstance = this
     	let yearScale = d3.scaleLinear()
 		    .domain([this.seasonMin, this.seasonMax])
-		    .range([box.x + 10, box.x + box.width - 10])
+		    .range([this.overlay.x+ 10, this.overlay.x + this.overlay.width - 10])
 		    .clamp(true)
-
 	    // Cancel the current transition, if any.
-	    svg.transition().duration(0)
+	    //svg.transition().duration(0)
 
-	    overlay
+	    d3.select(this.$refs.overlay)
 				.on("mouseover", mouseover)
 				.on("mouseout", mouseout)
 				.on("mousemove", mousemove)
 				.on("touchmove", mousemove)
 
 		    function mouseover() {
-			label.classed("active", true)
+					//Make label active
 		    }
 
 		    function mouseout() {
-			label.classed("active", false)
+					//Make label deactive
 		    }
 
 		    function mousemove() {
-		    let currentYear = Math.round(yearScale.invert(d3.mouse(this)[0]));
-				label.text(Math.round(currentYear))
-				ball.data(vueInstance.getDataTeamWise(currentYear))
-    		//vueInstance.styleBall(ball, ballWidth)
-    		vueInstance.positionBalls(ball,xScale,yScale)
-
+		    let currentYear = Math.round(yearScale.invert(d3.mouse(this)[0]))
+		    //vueInstance.displayYear(currentYear,label,ball,xScale,yScale);
+		    	vueInstance.addBalls(currentYear);
+		    	vueInstance.displayYearChange(currentYear);
 		    }
+			},
+			displayYearChange(currentYear){
+				this.displayYear = currentYear;
 			}
 	},
 	mounted: function () {
@@ -122,104 +190,25 @@
    			seasonMin = this.seasonMin,
    			seasonMax = this.seasonMax
 
-   	//Define SVG element
-    let svg = d3.select(this.$el).append('svg')
-    						.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-    						.attr('width', width + marginRight + marginLeft + extraPadding)
-      					.attr('height', height + marginTop + marginBottom + extraPadding)
 
   	//Define Scale
   	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, width+ marginRight]),
 				yScale = d3.scaleLinear().domain([yMin, yMax]).range([height, marginTop+marginBottom])
-
+		//Save it to the state
+		this.xScale = xScale;
+		this.yScale = yScale;
 		//Axis
 		let xAxis = d3.axisBottom().scale(xScale).ticks(xTicks, d3.format(",d"))
     let yAxis = d3.axisLeft().scale(yScale)
-
-    //Add x-axis
-  	svg.append("g")
-			.attr("class", "x axis")
-			.attr("transform", "translate(40," + height + ")")
-			.call(xAxis);
-
-		//Add y-axis
-		 svg.append("g")
-			.attr("class", "y axis")
-			.attr("transform", "translate("+40+")")
-			.call(yAxis);
-    	
-
-  	//Add ball
- 		let ball = svg.append("g")
- 			.attr("transform", "translate("+40+")")
- 			.selectAll('image')
- 			.data(this.getDataTeamWise(2008))
- 			.enter().append('image')
- 			.attr("xlink:href",(d) => "/images/ball.png")
-
- 		//Style Ball
- 		this.styleBall(ball,ballWidth)
-
-  	//Position the ball
-  	this.positionBalls(ball,xScale,yScale)
-
-    // Define the div for the tooltip
-		let tip = d3.select("#chart").append("div")
-								.attr('class', 'tooltip')
-								.style('opacity', 0)
-
-  	//Ball hover - show tooltip
-  	ball.on('mouseover', (d,i) => {vueInstance.showToolTip(tip,d)})
-  	//Ball mouseout - hide tooltip
-  	ball.on('mouseout', (d,i) => {vueInstance.hideToolTip(tip,d)})
-
-
-  	//Label Text X-axis
-   	svg.append("text")
-			.attr("class", "x axis label")
-			.attr("text-anchor", "end")
-			.attr("x", width)
-			.attr("y", height - 6)
-			.text("No. of boundaries")
-
-		//Label text Y-axis
-		svg.append("text")
-			.attr("class", "y axis label")
-			.attr("text-anchor", "end")
-			.attr("y", 25)
-			.attr("dy", ".75em")
-			.attr("transform", "translate(20) rotate(-90)")
-			.text("Total runs scored")
-
-		//Year Label
-		let label = svg.append("text")
-				    .attr("class", "year label")
-				    .attr("text-anchor", "end")
-				    .attr("y", height + 100)
-				    .attr("x", width)
-				    .text(seasonMin);
-
-    //Year Label Text to show year info
-		let labelText = svg.append("text")
-									    .attr("class", "year label-text")
-									    .attr("text-anchor", "end")
-									    .attr("y", height + 130)
-									    .attr("x", width)
-									    .text("IPL Season")
-
-		//Get the box outside Label
-    let box = label.node().getBBox()
-
-    //Add overlay over the label
-		let overlay = svg.append("rect")
-										.attr("class", "overlay")
-										.attr("x", box.x)
-										.attr("y", box.y)
-										.attr("width", box.width)
-										.attr("height", box.height)
-										.on("mouseover", ()=>this.enableInteraction(ball,label, box,svg,overlay,xScale,yScale));
-
-  		}
+		//New start
+		//Set the scale
+		xAxis(d3.select(this.$refs.xAxis));
+		yAxis(d3.select(this.$refs.yAxis));
+		//add the initial balls
+		this.addBalls(2008);
+		//Set the overlay
+    this.overlay = d3.select(this.$refs.label).node().getBBox()
+  	}
 	}
 </script>
 <style>
@@ -294,5 +283,8 @@
     border: 0px;		
     border-radius: 8px;			
     pointer-events: none;			
+	}
+	.hide {
+		display: none
 	}
 </style>
