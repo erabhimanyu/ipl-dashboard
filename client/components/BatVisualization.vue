@@ -9,14 +9,17 @@
 	    	<g class="x axis" id="" ref="xAxis" :transform="translate(40,height)"></g>
 	    	<g class="y axis" ref="yAxis" :transform="translate(40,0)"></g>
 	    	<g class="balls" ref="balls" v-bind:transform="translate(40,0)">
-	    		<image 	v-for="d in curretBallsData" 
-	    						:href="d.src" :x="d.x" :y="d.y" 
+	    		<transition-group name="list" tag="g">
+	    		<image 	v-for="(value, key, index) in curretBallsData" 
+	    						:href="value.src" :x="value.x" :y="value.y" 
 	    						:height="ballWidth" 
 	    						:width="ballWidth"
-	    						@mouseover="showToolTip(d.name, $event)"
+	    						:key="key"
+	    						@mouseover="showToolTip(key, $event)"
 	    						@mouseout="hideToolTip"
 	    						>
 	    		</image>
+	    		</transition-group>
 	    	</g>
 	    	<text class="x axis label" text-anchor="end" :x="width" :y="height-6">Runs scored in boundaries</text>
 	    	<text class="y axis label" text-anchor="end" y="25" dy=".75em" transform="translate(20) rotate(-90)">Total runs scored</text>
@@ -45,17 +48,23 @@
 	import seasonData from '../../data/seasons.json'
 	//import D3
 	import * as d3 from 'd3'
+	import TWEEN from 'tween.js'
+	import Config from '../config.js' 
 
 	export default {
 
 	data: function () {
 		let margin = {top: 10, bottom: 10, right: 10, left: 10}
+		let height = 500 - margin.top - margin.bottom;
+		let ballWidth = 50
+		let ballDefaultY= height - ballWidth/2
+		let curretBallsData = this.makeDefaultBallData(0,ballDefaultY)
 		return {
 			//Later I can add this to props and use as reusable component
 			margin: margin,
 			width: 700 - margin.right,
-			height: 500 - margin.top - margin.bottom,
-			ballWidth: 50,
+			height: height,
+			ballWidth: ballWidth,
 			extraPadding: 130,
 			xMin: 200,
 			xMax: 1800,
@@ -72,7 +81,7 @@
 			},
 			xScale: null,
 			yScale: null,
-			curretBallsData: [],
+			curretBallsData: curretBallsData,
 			displayYear: 2008,
 			tip: {
 				visible: false,
@@ -83,36 +92,73 @@
 		}
 	},
 	methods: {
-		addBalls(year) {			
-			let data = [];
-			this.getDataTeamWise(year).map((d)=> {
-				data.push({
-					x: this.xScale(this.calculateTotalBoundaries(d)), 
-					y: this.yScale(this.calculateTotalRuns(d)), 
-					src:'/images/ball.png',
-					name: d.name
-				})
+		makeDefaultBallData(x,y){
+			let data = {};
+			Object.keys(Config.teams).forEach((key)=>{
+				data[Config.teams[key].fullName] = {
+					x: x,
+					y: y,
+					src : Config.teams[key].imageSrc
 				}
-			)
-			this.curretBallsData = data;
+			})
+			return data
+		},
+		tween(newValue, oldValue) {
+			var vm = this
+      var animationFrame
+      //stop previous tweens
+      TWEEN.removeAll()
+      function animate (time) {
+        TWEEN.update(time)
+        animationFrame = requestAnimationFrame(animate)
+      }	
+
+    	function createTween(key) {
+	      	return new TWEEN.Tween({x: oldValue[key].x, y: oldValue[key].y})
+	        								.easing(TWEEN.Easing.Cubic.Out)
+	        								.to({x: newValue[key].x, y: newValue[key].y }, 1000)
+	        								.onUpdate(function () {
+	         										 vm.curretBallsData[key].x = this.x
+	          										vm.curretBallsData[key].y = this.y
+	        								})
+	        								.onComplete(function () {
+	          									cancelAnimationFrame(animationFrame)
+	        								})
+    	}
+    	//Create an array of tweens that needs to be started together
+    	let tweens = [];
+    	Object.keys(Config.teams).forEach((key)=>{
+    		let tempTween
+    		tempTween = createTween(Config.teams[key].fullName)
+    		tweens.push(tempTween)
+    	})
+    	//Create an constructor tween to chain the rest
+    	let TweenA = new TWEEN.Tween({x: 1})
+    			.to({x:1},0)
+    	//Chaining the tweens
+    	TweenA.chain(...tweens)
+    	//Start
+    	TweenA.start()
+      	
+      animationFrame = requestAnimationFrame(animate)
+    },
+		addBalls(year, curretBallsData) {	
+   			let vm = this
+   			let data = JSON.parse(JSON.stringify(curretBallsData));
+   			Object.keys(curretBallsData).forEach(function (key) {
+				  // do something with obj
+				  if(seasonData[year].teams[key]){
+				  	data[key].x = vm.xScale(vm.calculateTotalBoundaries(seasonData[year].teams[key]));
+				  	data[key].y = vm.yScale(vm.calculateTotalRuns(seasonData[year].teams[key]))-vm.ballWidth/2
+				  } else {
+				  	data[key].x = 0
+				  	data[key].y = vm.height - vm.ballWidth/2
+				  }
+				});
+				this.tween(data, this.curretBallsData)
 		},
 		translate(x,y){
 			return 'translate('+x+','+y+')'
-		},
-		interpolateData(event){
-			let currentYear = 2015;
-			//console.log(Math.round(this.yearScale.invert(d3.mouse(d3.select(this.$el).node()))))
-		    //vueInstance.displayYear(currentYear,label,ball,xScale,yScale);
-		   this.addBalls(currentYear);
-		},
-		getDataTeamWise(year) {
-			let data
-			data = Object.keys(seasonData[year].teams).map(function(k) {
-				let temp = seasonData[year].teams[k]
-				temp.name = k
-				return temp
-			})
-			return data
 		},
 		calculateTotalBoundaries(data) {
 			let total = Number(data.firstInnings.boundaries.total_runs) 
@@ -142,8 +188,6 @@
 		    .domain([this.seasonMin, this.seasonMax])
 		    .range([this.overlay.x+ 10, this.overlay.x + this.overlay.width - 10])
 		    .clamp(true)
-	    // Cancel the current transition, if any.
-	    //svg.transition().duration(0)
 
 	    d3.select(this.$refs.overlay)
 				.on("mouseover", mouseover)
@@ -161,8 +205,7 @@
 
 		    function mousemove() {
 		    let currentYear = Math.round(yearScale.invert(d3.mouse(this)[0]))
-		    //vueInstance.displayYear(currentYear,label,ball,xScale,yScale);
-		    	vueInstance.addBalls(currentYear);
+		    	vueInstance.addBalls(currentYear, vueInstance.curretBallsData);
 		    	vueInstance.displayYearChange(currentYear);
 		    }
 			},
@@ -176,19 +219,16 @@
     		margin = this.margin,
     		height = this.height,
     		width = this.width,
-    		ballWidth = this.ballWidth,
     		marginLeft = this.margin.left,
     		marginRight = this.margin.right,
     		marginTop = this.margin.top,
     		marginBottom = this.margin.bottom,
-    		extraPadding = this.extraPadding,
     		xTicks = this.xTicks,
     		xMin = this.xMin,
     		xMax = this.xMax,
     		yMin = this.yMin,
    			yMax = this.yMax,
-   			seasonMin = this.seasonMin,
-   			seasonMax = this.seasonMax
+   			seasonMin = this.seasonMin
 
 
   	//Define Scale
@@ -200,12 +240,12 @@
 		//Axis
 		let xAxis = d3.axisBottom().scale(xScale).ticks(xTicks, d3.format(",d"))
     let yAxis = d3.axisLeft().scale(yScale)
-		//New start
-		//Set the scale
+
+		//Set the axis
 		xAxis(d3.select(this.$refs.xAxis));
 		yAxis(d3.select(this.$refs.yAxis));
 		//add the initial balls
-		this.addBalls(2008);
+		this.addBalls(seasonMin, this.curretBallsData);
 		//Set the overlay
     this.overlay = d3.select(this.$refs.label).node().getBBox()
   	}
@@ -286,5 +326,9 @@
 	}
 	.hide {
 		display: none
+	}
+	.list-enter, .list-leave-to /* .list-leave-active for <2.1.8 */ {
+  opacity: 0;
+  transform: translateY(30px);
 	}
 </style>
