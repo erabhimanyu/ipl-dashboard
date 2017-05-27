@@ -5,8 +5,8 @@
     <div class="tooltip" :class="{ hide: !tip.visible }" :style="{top: tip.top + 'px', left: tip.left + 'px'} ">
     		<span>    		
     		<p>{{tip.name}}</p>
-    		<p>Runs:{{tip.runs}}</p>
-    		<p>Boundaries:{{tip.boundaries}}</p>
+    		<p>Total Runs:{{tip.runs}}</p>
+    		<p>Boundary Runs:{{tip.boundaries}}</p>
     		<span v-if="tip.outOfSeason" class="important-note">*Out from this season</span>
     		</span>
     </div>
