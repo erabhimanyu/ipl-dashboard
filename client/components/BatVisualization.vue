@@ -11,7 +11,7 @@
 	    	<g class="balls" ref="balls" v-bind:transform="translate(40,0)">
 	    		<transition-group name="list" tag="g">
 	    		<image 	v-for="(value, key, index) in curretBallsData" 
-	    						:href="value.src" :x="value.x" :y="value.y" 
+	    						:xlink:href="value.src" :x="value.x" :y="value.y" 
 	    						:height="ballWidth" 
 	    						:width="ballWidth"
 	    						:key="key"
