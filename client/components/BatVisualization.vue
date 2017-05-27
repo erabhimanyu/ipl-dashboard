@@ -23,24 +23,24 @@
 	    	</g>
 	    	<text class="x axis label" text-anchor="end" :x="width" :y="height-6">Runs scored in boundaries</text>
 	    	<text class="y axis label" text-anchor="end" y="25" dy=".75em" transform="translate(20) rotate(-90)">Total runs scored</text>
-	    	<text class="year label"
-	    				ref="label"
-	    				text-anchor="end" 
-	    				:y="height+100" 
-	    				:x="width">
-	    				{{ displayYear }}
-	    	</text>
-	    	<text class="year label-text" text-anchor="end" :y="height+130" :x="width">IPL Season</text>
-	    	<rect @mouseover="enableInteraction" 
-	    				class="overlay" 
-	    				:x="overlay.x" 
-	    				:y="overlay.y" 
-	    				:width="overlay.width"
-	    				ref="overlay"
-	    				:height="overlay.height"
-	    				>
-	    	</rect>
     	</svg>
+    	<div class="display-year-container">
+    		<div class="section">
+    			<button type="button" class="selected">Total</button>
+    			<button type="button">1st Innings</button>
+    			<button type="button">2nd Innings</button>
+    		</div>
+    		<span class="display-arrow" @click="changeYear('left')" :class="displayYear === 2008 ? 'disabled' : ''">
+    			<i class="fa fa-angle-left" aria-hidden="true"></i>
+    		</span>
+    		<div class="display-year">
+    			<span class="text">{{ displayYear }}</span>
+    			<span class="sub-label">Select IPL Season</span>
+    		</div>
+    		<span class="display-arrow" @click="changeYear('right')" :class="displayYear === 2016 ? 'disabled' : ''">
+    			<i class="fa fa-angle-right" aria-hidden="true" ></i>
+    		</span>
+    	</div>
     </div>
   </div>
 </template>
@@ -65,7 +65,7 @@
 			width: 700 - margin.right,
 			height: height,
 			ballWidth: ballWidth,
-			extraPadding: 130,
+			extraPadding: 50,
 			xMin: 200,
 			xMax: 1800,
 			yMin: 1000,
@@ -116,7 +116,7 @@
     	function createTween(key) {
 	      	return new TWEEN.Tween({x: oldValue[key].x, y: oldValue[key].y})
 	        								.easing(TWEEN.Easing.Cubic.Out)
-	        								.to({x: newValue[key].x, y: newValue[key].y }, 100)
+	        								.to({x: newValue[key].x, y: newValue[key].y }, 500)
 	        								.onUpdate(function () {
 	         										 vm.curretBallsData[key].x = this.x
 	          										vm.curretBallsData[key].y = this.y
@@ -181,38 +181,25 @@
   		this.tip.visible = false
   		this.tip.data = null
   	},
-  	enableInteraction(ball,label,box,svg,overlay,xScale,yScale) {
-
-  		let vueInstance = this
-    	let yearScale = d3.scaleLinear()
-		    .domain([this.seasonMin, this.seasonMax])
-		    .range([this.overlay.x+ 10, this.overlay.x + this.overlay.width - 10])
-		    .clamp(true)
-
-	    d3.select(this.$refs.overlay)
-				.on("mouseover", mouseover)
-				.on("mouseout", mouseout)
-				.on("mousemove", mousemove)
-				.on("touchmove", mousemove)
-
-		    function mouseover() {
-					//Make label active
-		    }
-
-		    function mouseout() {
-					//Make label deactive
-		    }
-
-		    function mousemove() {
-		    let currentYear = Math.round(yearScale.invert(d3.mouse(this)[0]))
-		    	vueInstance.addBalls(currentYear, vueInstance.curretBallsData);
-		    	vueInstance.displayYearChange(currentYear);
-		    }
-			},
-			displayYearChange(currentYear){
-				this.displayYear = currentYear;
-			}
+  	changeYear(type){
+  		if(type === 'left' && this.displayYear > 2008) {
+  			this.displayYear--
+  		} else if(type== 'right' && this.displayYear < 2016){
+  			this.displayYear ++
+  		}
+  		this.addBalls(this.displayYear, this.curretBallsData)
+  	},
+		displayYearChange(currentYear){
+			this.displayYear = currentYear;
+		},
+		initialLoop() {
+			let year = this.seasonMin
+			setTimeout(function(){
+              year++
+          }, 2000);
+		}
 	},
+
 	mounted: function () {
     // `this` points to the vm instance
     let vueInstance = this,
@@ -245,9 +232,9 @@
 		xAxis(d3.select(this.$refs.xAxis));
 		yAxis(d3.select(this.$refs.yAxis));
 		//add the initial balls
-		this.addBalls(seasonMin, this.curretBallsData);
-		//Set the overlay
-    this.overlay = d3.select(this.$refs.label).node().getBBox()
+		this.addBalls(seasonMin, this.curretBallsData)
+
+    this.initialLoop()
   	}
 	}
 </script>
@@ -304,13 +291,6 @@
 	.year.label.active {
     fill: #616161;
 	}
-
-	.overlay {
-    fill: none;
-    pointer-events: all;
-    cursor: ew-resize;
-	}
-
 	.tooltip {
     position: absolute;		
     text-align: center;
@@ -330,5 +310,73 @@
 	.list-enter, .list-leave-to /* .list-leave-active for <2.1.8 */ {
   opacity: 0;
   transform: translateY(30px);
+	}
+	.display-year-container {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-end;
+		font-style: MarkerFelt;
+		margin-bottom: 50px;
+			.display-year {
+				width: 180px;
+				height: 70px;
+			}
+			.display-year .text {
+				color: #616161;
+				padding: 10px;
+				cursor: auto;
+				font-size: 2em;
+			}
+
+			.display-year .sub-label {
+				font-size: 0.6em;
+			}
+
+			.display-arrow {
+				background-color: burlywood;
+				width: 50px;
+				height: 50px;
+				font-size: 1.5em;
+				text-align: center;
+				border-radius: 35px;
+				justify-content: center;
+				cursor: pointer;
+				margin-top: 15px;
+					i {
+						vertical-align: top;
+						color: white;
+					}
+			}
+			.disabled {
+						background-color: gray !important;
+
+					}
+			.section {
+				display: flex;
+				flex-direction: row;
+			}
+			.section button {
+			  margin: 20px;
+			  cursor: pointer;
+			  font-style: MarkereFelt;
+			  font-size: 1.0rem;
+			  padding: 10px;
+			  min-width: 100px; 
+			  display: block;
+			  background-color: #009ac9;
+			  border: 1px solid transparent;
+			  color: #ffffff;
+			  font-weight: 300;
+			  -webkit-border-radius: 3px;
+			  border-radius: 6px;
+			  -webkit-transition: all 0.3s ease-in-out;
+			  -moz-transition: all 0.3s ease-in-out;
+			  transition: all 0.3s ease-in-out;
+			}
+
+			.section .selected {
+				background-color: grey;
+			}
+
 	}
 </style>
