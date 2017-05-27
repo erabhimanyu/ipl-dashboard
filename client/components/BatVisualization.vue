@@ -26,9 +26,15 @@
     	</svg>
     	<div class="display-year-container">
     		<div class="section">
-    			<button type="button" class="selected">Total</button>
-    			<button type="button">1st Innings</button>
-    			<button type="button">2nd Innings</button>
+    			<button type="button" :class="currentSelection === 'total' ? 'selected' : ''" @click="changeSelection('total')">
+    			Total
+    			</button>
+    			<button type="button" :class="currentSelection === 'first' ? 'selected' : ''" @click="changeSelection('first')">
+    			Bat First
+    			</button>
+    			<button type="button" :class="currentSelection === 'second' ? 'selected' : ''" @click="changeSelection('second')">
+    			Chase
+    			</button>
     		</div>
     		<span class="display-arrow" @click="changeYear('left')" :class="displayYear === 2008 ? 'disabled' : ''">
     			<i class="fa fa-angle-left" aria-hidden="true"></i>
@@ -67,7 +73,7 @@
 			ballWidth: ballWidth,
 			extraPadding: 50,
 			xMin: 200,
-			xMax: 1800,
+			xMax: 2000,
 			yMin: 1000,
 			yMax: 3500,
 			xTicks: 12,
@@ -88,6 +94,27 @@
 				data: null,
 				top: 0,
 				left: 0
+			},
+			currentSelection: 'total',
+			scale: {
+				total: {
+					xMin: 200,
+					xMax: 2000,
+					yMin: 1000,
+					yMax: 3500
+				},
+				first: {
+					xMin: 100,
+					xMax: 1800,
+					yMin: 500,
+					yMax: 2000
+				},
+				second: {
+					xMin: 200,
+					xMax: 1800,
+					yMin: 500,
+					yMax: 2000
+				}
 			}
 		}
 	},
@@ -161,13 +188,26 @@
 			return 'translate('+x+','+y+')'
 		},
 		calculateTotalBoundaries(data) {
-			let total = Number(data.firstInnings.boundaries.total_runs) 
-							
+			let total;
+			if(this.currentSelection === 'total') {
+				total = Number(data.firstInnings.boundaries.total_runs) + Number(data.secondInnings.boundaries.total_runs)
+			} else if (this.currentSelection === 'first') {
+					total = Number(data.firstInnings.boundaries.total_runs) 
+			} else if (this.currentSelection === 'second') {
+					total = Number(data.secondInnings.boundaries.total_runs) 
+			}
+
 			return total
 		},
 		calculateTotalRuns(data) {
-			let total = data.firstInnings.runs 
-								+ data.secondInnings.runs
+		let total;
+			if(this.currentSelection === 'total') {
+				total = Number(data.firstInnings.runs) + Number(data.secondInnings.runs)
+			} else if (this.currentSelection === 'first') {
+					total = Number(data.firstInnings.runs) 
+			} else if (this.currentSelection === 'second') {
+					total = Number(data.secondInnings.runs) 
+			}
 			return total
 		},
   	showToolTip(d,event){
@@ -190,19 +230,19 @@
   		this.addBalls(this.displayYear, this.curretBallsData)
   	},
 		displayYearChange(currentYear){
-			this.displayYear = currentYear;
+			this.displayYear = currentYear
 		},
-		initialLoop() {
-			let year = this.seasonMin
-			setTimeout(function(){
-              year++
-          }, 2000);
-		}
-	},
-
-	mounted: function () {
-    // `this` points to the vm instance
-    let vueInstance = this,
+		changeSelection(type) {
+			this.currentSelection = type
+			this.xMin = this.scale[type].xMin
+			this.yMin = this.scale[type].yMin
+			this.xMax = this.scale[type].xMax
+			this.yMax = this.scale[type].yMax
+			this.defineScale()
+			this.addBalls(this.displayYear, this.curretBallsData)
+		},
+		defineScale() {
+			 let vueInstance = this,
     		margin = this.margin,
     		height = this.height,
     		width = this.width,
@@ -216,25 +256,26 @@
     		yMin = this.yMin,
    			yMax = this.yMax,
    			seasonMin = this.seasonMin
+			//Define Scale
+	  	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, width+ marginRight]),
+					yScale = d3.scaleLinear().domain([yMin, yMax]).range([height, marginTop+marginBottom])
+			//Save it to the state
+			this.xScale = xScale;
+			this.yScale = yScale;
+			//Axis
+			let xAxis = d3.axisBottom().scale(xScale).ticks(xTicks, d3.format(",d"))
+	    let yAxis = d3.axisLeft().scale(yScale)
 
-
-  	//Define Scale
-  	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, width+ marginRight]),
-				yScale = d3.scaleLinear().domain([yMin, yMax]).range([height, marginTop+marginBottom])
-		//Save it to the state
-		this.xScale = xScale;
-		this.yScale = yScale;
-		//Axis
-		let xAxis = d3.axisBottom().scale(xScale).ticks(xTicks, d3.format(",d"))
-    let yAxis = d3.axisLeft().scale(yScale)
-
-		//Set the axis
-		xAxis(d3.select(this.$refs.xAxis));
-		yAxis(d3.select(this.$refs.yAxis));
+			//Set the axis
+			xAxis(d3.select(this.$refs.xAxis));
+			yAxis(d3.select(this.$refs.yAxis));
+		}
+	},
+	mounted: function () {
+  	//Call to define the scale
+  	this.defineScale()
 		//add the initial balls
-		this.addBalls(seasonMin, this.curretBallsData)
-
-    this.initialLoop()
+		this.addBalls(this.seasonMin, this.curretBallsData)
   	}
 	}
 </script>
