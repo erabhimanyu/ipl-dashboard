@@ -3,19 +3,24 @@
     <img src="/images/batsman.png">
     <div id="chart">
     <div class="tooltip" :class="{ hide: !tip.visible }" :style="{top: tip.top + 'px', left: tip.left + 'px'} ">
-    		<p>{{tip.data}}</p>
+    		<span>    		
+    		<p>{{tip.name}}</p>
+    		<p>Runs:{{tip.runs}}</p>
+    		<p>Boundaries:{{tip.boundaries}}</p>
+    		<span v-if="tip.outOfSeason" class="important-note">*Out from this season</span>
+    		</span>
     </div>
     	<svg :height="height+extraPadding" :width="width+extraPadding" ref="containerSvg">
 	    	<g class="x axis" id="" ref="xAxis" :transform="translate(40,height)"></g>
 	    	<g class="y axis" ref="yAxis" :transform="translate(40,0)"></g>
 	    	<g class="balls" ref="balls" v-bind:transform="translate(40,0)">
 	    		<transition-group name="list" tag="g">
-	    		<image 	v-for="(value, key, index) in curretBallsData" 
+	    		<image 	v-for="(value, key, index) in currentBallsData" 
 	    						:xlink:href="value.src" :x="value.x" :y="value.y" 
 	    						:height="ballWidth" 
 	    						:width="ballWidth"
 	    						:key="key"
-	    						@mouseover="showToolTip(key, $event)"
+	    						@mouseover="showToolTip(key,value.runs, value.boundaries, value.outOfSeason, $event)"
 	    						@mouseout="hideToolTip"
 	    						>
 	    		</image>
@@ -61,10 +66,10 @@
 
 	data: function () {
 		let margin = {top: 10, bottom: 10, right: 10, left: 10}
-		let height = 500 - margin.top - margin.bottom;
+		let height = 500 - margin.top - margin.bottom
 		let ballWidth = 50
 		let ballDefaultY= height - ballWidth/2
-		let curretBallsData = this.makeDefaultBallData(0,ballDefaultY)
+		let currentBallsData = this.makeDefaultBallData(0,ballDefaultY)
 		return {
 			//Later I can add this to props and use as reusable component
 			margin: margin,
@@ -87,7 +92,7 @@
 			},
 			xScale: null,
 			yScale: null,
-			curretBallsData: curretBallsData,
+			currentBallsData: currentBallsData,
 			displayYear: 2008,
 			tip: {
 				visible: false,
@@ -120,12 +125,15 @@
 	},
 	methods: {
 		makeDefaultBallData(x,y){
-			let data = {};
+			let data = {}
 			Object.keys(teams).forEach((key)=>{
 				data[teams[key].fullName] = {
 					x: x,
 					y: y,
-					src : teams[key].ballImageSrc
+					src : teams[key].ballImageSrc,
+					runs: 0,
+					boundaries: 0,
+					outOfSeason: false
 				}
 			})
 			return data
@@ -145,15 +153,16 @@
 	        								.easing(TWEEN.Easing.Cubic.Out)
 	        								.to({x: newValue[key].x, y: newValue[key].y }, 500)
 	        								.onUpdate(function () {
-	         										 vm.curretBallsData[key].x = this.x
-	          										vm.curretBallsData[key].y = this.y
+	         										 vm.currentBallsData[key].x = this.x
+	          										vm.currentBallsData[key].y = this.y
+
 	        								})
 	        								.onComplete(function () {
 	          									cancelAnimationFrame(animationFrame)
 	        								})
     	}
     	//Create an array of tweens that needs to be started together
-    	let tweens = [];
+    	let tweens = []
     	Object.keys(teams).forEach((key)=>{
     		let tempTween
     		tempTween = createTween(teams[key].fullName)
@@ -169,26 +178,38 @@
       	
       animationFrame = requestAnimationFrame(animate)
     },
-		addBalls(year, curretBallsData) {	
+		addBalls(year, currentBallsData) {	
    			let vm = this
-   			let data = JSON.parse(JSON.stringify(curretBallsData));
-   			Object.keys(curretBallsData).forEach(function (key) {
+   			let data = JSON.parse(JSON.stringify(currentBallsData))
+   			let runs, boundaries
+   			Object.keys(currentBallsData).forEach(function (key) {
 				  // do something with obj
 				  if(seasonData[year].teams[key]){
-				  	data[key].x = vm.xScale(vm.calculateTotalBoundaries(seasonData[year].teams[key]));
-				  	data[key].y = vm.yScale(vm.calculateTotalRuns(seasonData[year].teams[key]))-vm.ballWidth/2
+				  	 boundaries = vm.calculateTotalBoundaries(seasonData[year].teams[key])
+				  	runs = vm.calculateTotalRuns(seasonData[year].teams[key])
+				  	
+				  	data[key].x = vm.xScale(boundaries)
+				  	data[key].y = vm.yScale(runs)-vm.ballWidth/2
+				  	//Set runs and boundaries values before tweening the position coordinates
+				  	vm.currentBallsData[key].runs = runs
+				  	vm.currentBallsData[key].boundaries = boundaries
+				  	vm.currentBallsData[key].outOfSeason = false
 				  } else {
 				  	data[key].x = 0
 				  	data[key].y = vm.height - vm.ballWidth/2
+				  	//Set runs and boundaries values before tweening the position coordinates
+				  	vm.currentBallsData[key].runs = 0
+				  	vm.currentBallsData[key].boundaries = 0
+				  	vm.currentBallsData[key].outOfSeason = true
 				  }
-				});
-				this.tween(data, this.curretBallsData)
+				})
+				this.tween(data, this.currentBallsData)
 		},
 		translate(x,y){
 			return 'translate('+x+','+y+')'
 		},
 		calculateTotalBoundaries(data) {
-			let total;
+			let total
 			if(this.currentSelection === 'total') {
 				total = Number(data.firstInnings.boundaries.total_runs) + Number(data.secondInnings.boundaries.total_runs)
 			} else if (this.currentSelection === 'first') {
@@ -200,7 +221,7 @@
 			return total
 		},
 		calculateTotalRuns(data) {
-		let total;
+		let total
 			if(this.currentSelection === 'total') {
 				total = Number(data.firstInnings.runs) + Number(data.secondInnings.runs)
 			} else if (this.currentSelection === 'first') {
@@ -210,8 +231,11 @@
 			}
 			return total
 		},
-  	showToolTip(d,event){
-			this.tip.data = d
+  	showToolTip(d,runs,boundaries,outOfSeason,event){
+			this.tip.name = d
+			this.tip.runs = runs
+			this.tip.boundaries = boundaries
+			this.tip.outOfSeason = outOfSeason
 			//this.
 			this.tip.visible = true
 			this.tip.top = event.pageY+15
@@ -227,7 +251,7 @@
   		} else if(type== 'right' && this.displayYear < 2016){
   			this.displayYear ++
   		}
-  		this.addBalls(this.displayYear, this.curretBallsData)
+  		this.addBalls(this.displayYear, this.currentBallsData)
   	},
 		displayYearChange(currentYear){
 			this.displayYear = currentYear
@@ -239,7 +263,7 @@
 			this.xMax = this.scale[type].xMax
 			this.yMax = this.scale[type].yMax
 			this.defineScale()
-			this.addBalls(this.displayYear, this.curretBallsData)
+			this.addBalls(this.displayYear, this.currentBallsData)
 		},
 		defineScale() {
 			 let vueInstance = this,
@@ -260,22 +284,22 @@
 	  	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, width+ marginRight]),
 					yScale = d3.scaleLinear().domain([yMin, yMax]).range([height, marginTop+marginBottom])
 			//Save it to the state
-			this.xScale = xScale;
-			this.yScale = yScale;
+			this.xScale = xScale
+			this.yScale = yScale
 			//Axis
 			let xAxis = d3.axisBottom().scale(xScale).ticks(xTicks, d3.format(",d"))
 	    let yAxis = d3.axisLeft().scale(yScale)
 
 			//Set the axis
-			xAxis(d3.select(this.$refs.xAxis));
-			yAxis(d3.select(this.$refs.yAxis));
+			xAxis(d3.select(this.$refs.xAxis))
+			yAxis(d3.select(this.$refs.yAxis))
 		}
 	},
 	mounted: function () {
   	//Call to define the scale
   	this.defineScale()
 		//add the initial balls
-		this.addBalls(this.seasonMin, this.curretBallsData)
+		this.addBalls(this.seasonMin, this.currentBallsData)
   	}
 	}
 </script>
@@ -336,14 +360,36 @@
     position: absolute;		
     text-align: center;
     z-index: 20;			
-    width: 100px;					
-    max-height: 50px;					
+    width: 200px;					
+    min-height: 100px;					
     padding: 2px;				
     font: 12px sans-serif;		
-    background: lightsteelblue;	
+    background: white;	
     border: 0px;		
     border-radius: 8px;			
-    pointer-events: none;			
+    pointer-events: none;		
+    box-shadow: 5px 5px 2px #888888;
+    padding: 10px;
+
+    p {
+    	color: #616161;
+    	font-weight: 600;
+    	font-size: 0.8rem;
+    	font-style: MarkerFelt;
+    	text-align: left;
+    }
+	}
+
+	.tooltip span:before {
+		content:' '; /* Must have content to display */
+    position:absolute;
+    top:20%;
+    left:-16px; /* 2 x border width */
+    width:0;
+    height:0;
+    margin-top:-8px; /* - border width */
+    border:8px solid transparent;
+    border-right-color:white;
 	}
 	.hide {
 		display: none
@@ -418,6 +464,10 @@
 			.section .selected {
 				background-color: grey;
 			}
-
 	}
+	.important-note{
+			color:#d85549;
+			align-items: left;
+	}
+
 </style>
