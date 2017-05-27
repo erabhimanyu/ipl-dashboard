@@ -20,7 +20,7 @@
 import HeaderElement from 'components/Header'
 import ForkGithub from 'components/ForkGithub'
 import FooterElement from 'components/Footer'
-import {teams} from '../Config.js'
+import {teams} from '../Teams.js'
 
 export default {
   components: {

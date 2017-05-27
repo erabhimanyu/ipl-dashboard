@@ -24,7 +24,7 @@
 </template>
 
 <script>
-  import { teams } from '../Config.js'
+  import { teams } from '../Teams.js'
   export default {
     data: function() {
       return {...teams}

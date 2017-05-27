@@ -50,6 +50,7 @@
 	import * as d3 from 'd3'
 	import TWEEN from 'tween.js'
 	import Config from '../config.js' 
+	import {teams} from '../Teams.js' 
 
 	export default {
 
