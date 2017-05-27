@@ -116,7 +116,7 @@
     	function createTween(key) {
 	      	return new TWEEN.Tween({x: oldValue[key].x, y: oldValue[key].y})
 	        								.easing(TWEEN.Easing.Cubic.Out)
-	        								.to({x: newValue[key].x, y: newValue[key].y }, 1000)
+	        								.to({x: newValue[key].x, y: newValue[key].y }, 100)
 	        								.onUpdate(function () {
 	         										 vm.curretBallsData[key].x = this.x
 	          										vm.curretBallsData[key].y = this.y
