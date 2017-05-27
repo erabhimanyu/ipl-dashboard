@@ -49,7 +49,6 @@
 	//import D3
 	import * as d3 from 'd3'
 	import TWEEN from 'tween.js'
-	import Config from '../config.js' 
 	import {teams} from '../Teams.js' 
 
 	export default {
@@ -95,11 +94,11 @@
 	methods: {
 		makeDefaultBallData(x,y){
 			let data = {};
-			Object.keys(Config.teams).forEach((key)=>{
-				data[Config.teams[key].fullName] = {
+			Object.keys(teams).forEach((key)=>{
+				data[teams[key].fullName] = {
 					x: x,
 					y: y,
-					src : Config.teams[key].imageSrc
+					src : teams[key].ballImageSrc
 				}
 			})
 			return data
@@ -128,9 +127,9 @@
     	}
     	//Create an array of tweens that needs to be started together
     	let tweens = [];
-    	Object.keys(Config.teams).forEach((key)=>{
+    	Object.keys(teams).forEach((key)=>{
     		let tempTween
-    		tempTween = createTween(Config.teams[key].fullName)
+    		tempTween = createTween(teams[key].fullName)
     		tweens.push(tempTween)
     	})
     	//Create an constructor tween to chain the rest
