@@ -4,6 +4,7 @@
     	<ForkGithub></ForkGithub>
     	<HeaderElement></HeaderElement>
     	<BatVisualization></BatVisualization>
+      <Players></Players>
     	<TeamListing></TeamListing>
     	<div class="stadium"></div>
     	<FooterElement></FooterElement>
@@ -17,6 +18,7 @@ import ForkGithub from 'components/ForkGithub'
 import BatVisualization from 'components/BatVisualization'
 import TeamListing from 'components/TeamListing'
 import FooterElement from 'components/Footer'
+import Players from 'components/Players'
 
 
 export default {
@@ -24,6 +26,7 @@ export default {
     HeaderElement,
     ForkGithub,
     BatVisualization,
+    Players,
     TeamListing,
     FooterElement
   }
