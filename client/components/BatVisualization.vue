@@ -321,7 +321,7 @@
     	margin-top: 20px;
     	
     	img {
-    		zoom: 0.7;
+    		max-height: 250px;
     		padding-top: 200px;
     		padding-left: 50px;
     	}
