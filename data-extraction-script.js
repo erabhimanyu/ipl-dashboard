@@ -266,11 +266,30 @@ matchesData.forEach((matchItem)=> {
 	}
 });
 
-//Write file to local
-fs.writeFile('./data/seasons.json', JSON.stringify(seasons), 'utf-8', function(err) {
-	if (err) throw err
-	console.log('Done!')
-})
+let stadiums = {};
 
-console.log(seasons);
+matchesData.forEach((item)=> {
+	let currentStadium = stadiums[item.venue]
+
+	if(currentStadium) {
+		currentStadium.win_by_wickets += item.win_by_wickets
+		currentStadium.win_by_runs += item.win_by_runs
+		currentStadium.total_match++
+	} else {
+		stadiums[item.venue] = { 
+			city : item.city, 
+			win_by_wickets: item.win_by_wickets, 
+			win_by_runs: item.win_by_runs,
+			total_match: 1 
+		}
+	}
+
+})
+// //Write file to local
+// fs.writeFile('./data/seasons.json', JSON.stringify(seasons), 'utf-8', function(err) {
+// 	if (err) throw err
+// 	console.log('Done!')
+// })
+
+console.log(stadiums);
 
