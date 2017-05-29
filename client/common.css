@@ -1,28 +1,4 @@
 @font-face {
-  font-family: 'GothamMedium';
-  src: url('/fonts/Gotham-Medium.eot');
-  src: url('/fonts/Gotham-Medium.eot?#iefix') format('embedded-opentype'),
-  url('/fonts/Gotham-Medium.woff') format('woff'),
-  url('/fonts/Gotham-Medium.ttf')  format('truetype'),
-  url('/fonts/Gotham-Medium.svg#svgFontName') format('svg');
-}
-@font-face {
-  font-family: 'GothamBook';
-  src: url('/fonts/Gotham-Book.eot');
-  src: url('/fonts/Gotham-Book.eot?#iefix') format('embedded-opentype'),
-  url('/fonts/Gotham-Book.woff') format('woff'),
-  url('/fonts/Gotham-Book.ttf')  format('truetype'),
-  url('/fonts/Gotham-Book.svg#svgFontName') format('svg');
-}
-@font-face {
-  font-family: 'OpenSans';
-  src: url('/fonts/OpenSans.eot');
-  src: url('/fonts/OpenSans.eot?#iefix') format('embedded-opentype'),
-  url('/fonts/OpenSans.woff') format('woff'),
-  url('/fonts/OpenSans.ttf')  format('truetype'),
-  url('/fonts/OpenSans.svg#svgFontName') format('svg');
-}
-@font-face {
   font-family: 'MarkerFelt';
   src: url('/fonts/Marker-Felt.eot');
   src: url('/fonts/Marker-Felt.eot?#iefix') format('embedded-opentype'),
