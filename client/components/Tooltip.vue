@@ -30,7 +30,7 @@
     p {
     	color: #616161;
     	font-weight: 600;
-    	font-size: 0.8rem;
+    	font-size: 0.8rem !important;
     	font-style: MarkerFelt;
     	text-align: left;
     }
