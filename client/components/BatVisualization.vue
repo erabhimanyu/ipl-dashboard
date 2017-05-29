@@ -2,14 +2,14 @@
 	<div class="bat-visualization-wrapper">
     <img src="/images/batsman.png">
     <div id="chart">
-    <div class="tooltip" :class="{ hide: !tip.visible }" :style="{top: tip.top + 'px', left: tip.left + 'px'} ">
-    		<span>    		
-    		<p>{{tip.name}}</p>
-    		<p>Total Runs:{{tip.runs}}</p>
-    		<p>Boundary Runs:{{tip.boundaries}}</p>
-    		<span v-if="tip.outOfSeason" class="important-note">*Out from this season</span>
-    		</span>
-    </div>
+	    <Tooltip :top='tip.top' :left='tip.left' :visible='tip.visible'>
+	    	<span slot="content">    		
+	    		<p>{{tip.name}}</p>
+	    		<p>Total Runs:{{tip.runs}}</p>
+	    		<p>Boundary Runs:{{tip.boundaries}}</p>
+	    		<span v-if="tip.outOfSeason" class="important-note">*Out from this season</span>
+	    	</span>
+	    </Tooltip>
     	<svg :height="height+extraPadding" :width="width+extraPadding" ref="containerSvg">
 	    	<g class="x axis" id="" ref="xAxis" :transform="translate(40,height)"></g>
 	    	<g class="y axis" ref="yAxis" :transform="translate(40,0)"></g>
@@ -61,9 +61,12 @@
 	import * as d3 from 'd3'
 	import TWEEN from 'tween.js'
 	import {teams} from '../Teams.js' 
+	import Tooltip from './Tooltip'
 
 	export default {
-
+	components: {
+		Tooltip
+	},
 	data: function () {
 		let margin = {top: 10, bottom: 10, right: 10, left: 10}
 		let height = 500 - margin.top - margin.bottom
