@@ -24,9 +24,7 @@
     "promise-polyfill": "^6.0.2",
     "tween.js": "^16.6.0",
     "vue": "^2.2.0",
-    "vue-router": "^2.0.0",
-    "vuex": "^2.0.0",
-    "vuex-router-sync": "^4.0.0"
+    "vue-router": "^2.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^6.4.0",
@@ -42,7 +40,6 @@
     "file-loader": "^0.9.0",
     "friendly-errors-webpack-plugin": "^1.1.2",
     "html-webpack-plugin": "^2.22.0",
-    "offline-plugin": "^4.5.3",
     "on-build-webpack": "^0.1.0",
     "postcss-loader": "^0.9.1",
     "postcss-nested": "^1.0.0",
