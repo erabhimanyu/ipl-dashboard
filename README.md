@@ -4,4 +4,3 @@ An interactive IPL dashboard featuring data of past 8 seasons.
 npm run dev
 
 A process timeline to convert this application.
-![Screenshot](screenshot.png)
